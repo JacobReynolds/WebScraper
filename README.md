@@ -1,3 +1,10 @@
 WebScraper
 ==========
-Very beginning stages of this program.  <del>As of now it is only able to send e-mails.</del>  Can now send e-mails and retrieve grades from Moodle.  Somewhat hardcoded to personal layout of moodle as of now though.  I will modify the README with more detail once I get more of it working.
+This is a web scraping program that will log in to the University of Minnesota Moodle website and compare current grades to the grades at the last time they were checked.  If they have been changed, an email will be sent with the updated grade values.  There are a few hardcoded segments right now for the Moodle layout, but that is the next thing to be fixed.  Basic applet as well that displays the time of the last check and grades at the time.  
+
+All comments beginning with //--- are user instructions telling where to input passwords and what each function does.
+All comments beginning with // are bugs or functions that have not yet been implemented.
+
+Any complaints or comments can be e-mailed to reyno511@umn.edu.
+
+-Jacob Reynolds
