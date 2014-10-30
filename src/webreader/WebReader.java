@@ -12,23 +12,26 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.html.HtmlPasswordInput;
 import com.gargoylesoftware.htmlunit.html.HtmlSubmitInput;
 import com.gargoylesoftware.htmlunit.html.HtmlTextInput;
-import java.io.BufferedInputStream;
+import java.applet.Applet;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.DataInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
+import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.PasswordAuthentication;
@@ -38,15 +41,87 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.Transport;
 import org.apache.commons.logging.LogFactory;
 
+public class WebReader 
+extends Applet
+{
+    private List gradesList = new LinkedList();
+    //Want to add Moodle username and password input 
+    //Save it to an encrypted file so that it does not need to be entered again
+    private String username, password;
 
-public class WebReader {
-
-
-
-    public static void main(String[] args) throws Exception {
-  
+    public void init()
+    {   
+        //---Sets size and background color
+        System.setProperty("maroon", "#993333");
+        setBackground(Color.getColor("maroon"));
+        Dimension dimension = new Dimension(350, 350);
+        setSize(dimension);
+    }
+     
+    public void paint(Graphics g)
+    {
+        //---Draws outputs for applet and sets colors
+        System.setProperty("gold", "#FFCC00");
+        g.setColor(Color.getColor("gold"));
+        g.drawString(String.valueOf("Program running"), 0, 15);
+        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        Date date = new Date();
+        String dateOutput = dateFormat.format(date);
+        g.drawString(String.valueOf(dateOutput), 0, 45);
+        g.drawString(String.valueOf("Current grades:"),0,75);
+        //---Draws grades onto the applet
+        for (int i = 0; i < gradesList.size(); i++) {
+            g.drawString(String.valueOf(gradesList.get(i)),0,105+(30*i));
+         }
+            
+        //---Starts the program loop
+        try {
+            runProgram();
+        } catch (IOException ex) {
+            Logger.getLogger(WebReader.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(WebReader.class.getName()).log(Level.SEVERE, null, ex);
+        }
         
+       
+    }
+    
+    private void runProgram() throws IOException, InterruptedException
+    {
+        //---get the HtmlPage with grades on it
+        final HtmlPage page2 = getPage();
+
+        //---Sends the new page to be cleaned and parsed for grades
+        //---clean(String string) returns a string
+        String grades = clean(page2.asText());
+        File f = new File("Grades.txt");
+        if (!f.exists())
+        {
+            updateGrades(grades);
+        }
+        else
+        {
+        if (!grades.equals(fileReader()))
+        {  
+        //---Updates the grades in the saved file it compares them to    
+        updateGrades(grades);
         
+        //---Takes the new grades and sends them to the e-mail in the
+        //---sendEmail function
+        sendEmail(grades);
+            System.out.println("program end");
+        }
+        else
+        {
+            System.out.println("program end");
+        }}
+        Thread.sleep(10000);
+        repaint();
+    }
+    
+   
+    private HtmlPage getPage() throws IOException
+    {
         System.out.println("program is running");
        
         //---Suppresses unneeded warnings for CSS and other things
@@ -77,31 +152,14 @@ public class WebReader {
 
         //---New page after clicking the button
         final HtmlPage page2 = webClient.getPage("https://ay14.moodle.umn.edu/my/");
-
-        //---Sends the new page to be cleaned and parsed for grades
-        //---clean(String string) returns a string
-        String grades = clean(page2.asText());
-
-        
-        if (!grades.equals(fileReader()))
-        {  
-        //---Updates the grades in the saved file it compares them to    
-        updateGrades(grades);
-        
-        //---Takes the new grades and sends them to the e-mail in the
-        //---sendEmail function
-        sendEmail(grades);
-        }
-        
+       
         //---Closes windows for current session
         webClient.closeAllWindows();
         
-        
-        
-         
-        }
+        return page2;
+    }
     
-    private static void sendEmail(String inputMessage)
+    private void sendEmail(String inputMessage)
     {
         
         final String username = "xiixsnb@gmail.com";
@@ -144,12 +202,13 @@ public class WebReader {
         //---for the above method
     }
     
-   private static String clean(String dirtyString)
+   private String clean(String dirtyString)
    {
        String cleanString = "";
        List wordList = new LinkedList();
        String newWord = "";
        int beginningOfWord = 0;
+       gradesList = new LinkedList();
        //---Some words are seperated by a line seperator which is not a space
        String newLine = System.getProperty("line.separator");
        
@@ -187,6 +246,7 @@ public class WebReader {
                    }
                    else
                    {
+                       gradesList.add(wordList.get(j));
                        cleanString += wordList.get(j) + System.lineSeparator();
                    }
                }
@@ -196,7 +256,7 @@ public class WebReader {
        return cleanString;
    }
    
-   public static String fileReader() {
+   public String fileReader() {
        String answer = "";
        
        BufferedReader br = null;
@@ -205,7 +265,7 @@ public class WebReader {
  
 			String sCurrentLine;
  
-			br = new BufferedReader(new FileReader("/Users/colleen-reynolds/Desktop/School/CSCI/Projects/WebScraper/Grades.txt"));
+			br = new BufferedReader(new FileReader("Grades.txt"));
  
 			while ((sCurrentLine = br.readLine()) != null) {
                                 answer += sCurrentLine + System.lineSeparator();
@@ -221,28 +281,36 @@ public class WebReader {
 			}
 		}
  
-	
-       
-       
-       
        return answer;
   }
    
-   public static void updateGrades(String grades) throws FileNotFoundException, IOException
+   public void updateGrades(String grades) throws FileNotFoundException, IOException
    {
        System.out.println("updating grades");
        BufferedReader br = null;
        BufferedWriter bw = null;
-       
-       br = new BufferedReader(new FileReader("/Users/colleen-reynolds/Desktop/School/CSCI/Projects/WebScraper/Grades.txt"));
-       bw = new BufferedWriter(new FileWriter("/Users/colleen-reynolds/Desktop/School/CSCI/Projects/WebScraper/Grades.txt", false));
-       
-       bw.write(grades);
-       bw.close();
-       br.close();
+       File f = new File("Grades.txt");
+       if (f.exists())
+       {
+           br = new BufferedReader(new FileReader("Grades.txt"));
+           bw = new BufferedWriter(new FileWriter("Grades.txt", false));
+           bw.write(grades);
+           bw.close();
+           br.close();
+       }
+       else
+       {
+           f.createNewFile();
+           br = new BufferedReader(new FileReader("Grades.txt"));
+           bw = new BufferedWriter(new FileWriter("Grades.txt", false));
+           bw.write(grades);
+           bw.close();
+           br.close();
+       }
+      
    }
    
-    }
+}
 
 
     
