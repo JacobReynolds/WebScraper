@@ -85,7 +85,6 @@ implements KeyListener
         //---When we have grades, print them
         if (!gradesList.isEmpty())
         {
-            System.out.println(emailSent);
             g.drawString(emailSent, 10, 125);
             g.drawString("Grades:", 10, 140);
             for (int i = 0; i < gradesList.size(); i++) {
