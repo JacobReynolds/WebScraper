@@ -57,7 +57,7 @@ public class WebReader
         username = scanner.nextLine();
         char[] charPassword = console.readPassword("Enter password: ");
         password = new String(charPassword);
-        System.out.print("Gmail: ");
+        System.out.print("Non-UofM Gmail: ");
         email = scanner.nextLine();
         char[] charEmailPassword = console.readPassword("Gmail password: ");
         emailPassword = new String(charEmailPassword);
@@ -127,7 +127,7 @@ public class WebReader
         
         //---Creating webClient and allowing access to website
         //---Also supresses some unneeded script warnings
-        final WebClient webClient = new WebClient(BrowserVersion.CHROME);
+        final WebClient webClient = new WebClient(BrowserVersion.getDefault());
         webClient.getOptions().setUseInsecureSSL(true);
         webClient.getOptions().setThrowExceptionOnScriptError(false);
         
@@ -237,7 +237,7 @@ public class WebReader
            {
                
                for (int j = i + 2; j < wordList.size(); j++) {
-                   if (wordList.get(j).equals("Skip"))
+                   if (wordList.get(j).equals("Skip") || wordList.get(j).equals("Twin"))
                    {   
                        return cleanString;
                    }
