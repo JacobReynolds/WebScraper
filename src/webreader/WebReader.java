@@ -12,14 +12,9 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.html.HtmlPasswordInput;
 import com.gargoylesoftware.htmlunit.html.HtmlSubmitInput;
 import com.gargoylesoftware.htmlunit.html.HtmlTextInput;
-import java.applet.Applet;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.TextField;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.Console;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -28,10 +23,12 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
+import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.mail.Message;
@@ -44,73 +41,99 @@ import javax.mail.Transport;
 import org.apache.commons.logging.LogFactory;
 
 public class WebReader 
-extends Applet
-implements KeyListener
 {
-    private String username, password, email, emailPassword;
-    private final TextField usernameField = new TextField(15);
-    private final TextField passwordField = new TextField(15);
-    private final TextField emailField = new TextField(15);
-    private final TextField emailPasswordField = new TextField(15);
+    private static String username, password, email, emailPassword;
+    private static long refreshRate;
+    
     ArrayList gradesList = new ArrayList();
     String emailSent = new String();
-    @Override
-    public void init()
+    
+    public static void main(String[] args)
     {
-        //---Sets initial applet properties and text fields
-        setSize(300,300);
-        System.setProperty("maroon", "#993333");
-        setBackground(Color.getColor("maroon"));
-        emailPasswordField.addKeyListener(this);
-        setFocusable(true);
-        add(usernameField);
-        add(passwordField);
-        add(emailField);
-        add(emailPasswordField);
-        passwordField.setEchoChar('*');
-        emailPasswordField.setEchoChar('*');        
-
+     WebReader app = new WebReader();
+     Scanner scanner = new Scanner(System.in);
+     Console console = System.console();
+        System.out.print("Username: ");
+        username = scanner.nextLine();
+        char[] charPassword = console.readPassword("Enter password: ");
+        password = new String(charPassword);
+        System.out.print("Gmail: ");
+        email = scanner.nextLine();
+        char[] charEmailPassword = console.readPassword("Gmail password: ");
+        emailPassword = new String(charEmailPassword);
+        System.out.println("How often(in minutes) do you want your grades checked? ");
+        refreshRate = Integer.parseInt(scanner.nextLine()) * 60000;
+        app.go();
     }
-    @Override
-    public void paint(Graphics g)
+    
+    public void go()
     {
-        //---Draws strings and prints grades
-        System.setProperty("gold", "#FFCC00");
-        g.setColor(Color.getColor("gold"));
-        g.drawString("Username:", 0, 15);
-        g.drawString("Password:", 0, 40);
-        g.drawString("Gmail:", 0, 70);
-        g.drawString("Password:", 0, 95);
-        
-        //---When we have grades, print them
-        if (!gradesList.isEmpty())
-        {
-            g.drawString(emailSent, 10, 125);
-            g.drawString("Grades:", 10, 140);
-            for (int i = 0; i < gradesList.size(); i++) {
-                g.drawString(gradesList.get(i).toString(), 10, 155 + (15 * i));
-            }
-            
-            //---Empty the list for the next cycle of the program
-            gradesList.clear();
-            
-            //---Rerun the program
-            try {
-                runProgram();
-            } catch (IOException ex) {
-                Logger.getLogger(WebReader.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(WebReader.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            
+        try {
+            runProgram();
+        } catch (IOException ex) {
+            Logger.getLogger(WebReader.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(WebReader.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+//    
+//    @Override
+//    public void init()
+//    {
+//        //---Sets initial applet properties and text fields
+//        setSize(300,300);
+//        System.setProperty("maroon", "#993333");
+//        setBackground(Color.getColor("maroon"));
+//        emailPasswordField.addKeyListener(this);
+//        setFocusable(true);
+//        add(usernameField);
+//        add(passwordField);
+//        add(emailField);
+//        add(emailPasswordField);
+//        passwordField.setEchoChar('*');
+//        emailPasswordField.setEchoChar('*');        
+//
+//    }
+//    @Override
+//    public void paint(Graphics g)
+//    {
+//        //---Draws strings and prints grades
+//        System.setProperty("gold", "#FFCC00");
+//        g.setColor(Color.getColor("gold"));
+//        g.drawString("Username:", 0, 15);
+//        g.drawString("Password:", 0, 40);
+//        g.drawString("Gmail:", 0, 70);
+//        g.drawString("Password:", 0, 95);
+//        
+//        //---When we have grades, print them
+//        if (!gradesList.isEmpty())
+//        {
+//            g.drawString(emailSent, 10, 125);
+//            g.drawString("Grades:", 10, 140);
+//            for (int i = 0; i < gradesList.size(); i++) {
+//                g.drawString(gradesList.get(i).toString(), 10, 155 + (15 * i));
+//            }
+//            
+//            //---Empty the list for the next cycle of the program
+//            gradesList.clear();
+//            
+//            //---Rerun the program
+//            try {
+//                runProgram();
+//            } catch (IOException ex) {
+//                Logger.getLogger(WebReader.class.getName()).log(Level.SEVERE, null, ex);
+//            } catch (InterruptedException ex) {
+//                Logger.getLogger(WebReader.class.getName()).log(Level.SEVERE, null, ex);
+//            }
+//            
+//        }
+//    }
     
     private void runProgram() throws IOException, InterruptedException
     {
+        System.out.println("Program running...");
         //---Get the HtmlPage with grades on it
         final HtmlPage page2 = getPage();
-
         //---Sends the new page to be cleaned and parsed for grades
         //---clean(String string) returns a string
         String grades = clean(page2.asText());
@@ -133,8 +156,17 @@ implements KeyListener
         sendEmail(grades);
         }
         }
+        for (int i = 0; i < gradesList.size(); i++) {
+                System.out.println(gradesList.get(i).toString());
+            }
+        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            Date date = new Date();
+        System.out.println("Grades were checked at " + dateFormat.format(date));
+        System.out.println();
+        gradesList.clear();
+        Thread.sleep(refreshRate);
         
-        repaint();
+        go();
     }
     
    
@@ -167,7 +199,6 @@ implements KeyListener
        
         //---Submits the form by clicking the button
         button.click();
-
         //---New page after clicking the button
         final HtmlPage page2 = webClient.getPage("https://ay14.moodle.umn.edu/my/");
        
@@ -210,6 +241,7 @@ implements KeyListener
             DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
             Date date = new Date();
             emailSent = "E-mail was sent: " + dateFormat.format(date);
+            System.out.println(emailSent);
         }
         catch(MessagingException e) {
             
@@ -326,31 +358,6 @@ implements KeyListener
       
    }
 
-    @Override
-    public void keyTyped(KeyEvent e) {
-    }
-
-    @Override
-    public void keyPressed(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_ENTER)
-        {
-            username = usernameField.getText();
-            password = passwordField.getText();
-            email = emailField.getText();
-            emailPassword = emailPasswordField.getText();
-            try {
-                runProgram();
-            } catch (IOException ex) {
-                Logger.getLogger(WebReader.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(WebReader.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-    }
-
-    @Override
-    public void keyReleased(KeyEvent e) {
-    }
 
 
    
