@@ -76,58 +76,6 @@ public class WebReader
             Logger.getLogger(WebReader.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-//    
-//    @Override
-//    public void init()
-//    {
-//        //---Sets initial applet properties and text fields
-//        setSize(300,300);
-//        System.setProperty("maroon", "#993333");
-//        setBackground(Color.getColor("maroon"));
-//        emailPasswordField.addKeyListener(this);
-//        setFocusable(true);
-//        add(usernameField);
-//        add(passwordField);
-//        add(emailField);
-//        add(emailPasswordField);
-//        passwordField.setEchoChar('*');
-//        emailPasswordField.setEchoChar('*');        
-//
-//    }
-//    @Override
-//    public void paint(Graphics g)
-//    {
-//        //---Draws strings and prints grades
-//        System.setProperty("gold", "#FFCC00");
-//        g.setColor(Color.getColor("gold"));
-//        g.drawString("Username:", 0, 15);
-//        g.drawString("Password:", 0, 40);
-//        g.drawString("Gmail:", 0, 70);
-//        g.drawString("Password:", 0, 95);
-//        
-//        //---When we have grades, print them
-//        if (!gradesList.isEmpty())
-//        {
-//            g.drawString(emailSent, 10, 125);
-//            g.drawString("Grades:", 10, 140);
-//            for (int i = 0; i < gradesList.size(); i++) {
-//                g.drawString(gradesList.get(i).toString(), 10, 155 + (15 * i));
-//            }
-//            
-//            //---Empty the list for the next cycle of the program
-//            gradesList.clear();
-//            
-//            //---Rerun the program
-//            try {
-//                runProgram();
-//            } catch (IOException ex) {
-//                Logger.getLogger(WebReader.class.getName()).log(Level.SEVERE, null, ex);
-//            } catch (InterruptedException ex) {
-//                Logger.getLogger(WebReader.class.getName()).log(Level.SEVERE, null, ex);
-//            }
-//            
-//        }
-//    }
     
     private void runProgram() throws IOException, InterruptedException
     {
