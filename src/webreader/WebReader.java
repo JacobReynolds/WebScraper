@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -208,7 +207,7 @@ public class WebReader
        int beginningOfWord = 0;
        //---Some words are seperated by a line seperator which is not a space
        String newLine = System.getProperty("line.separator");
-       
+       dirtyString = dirtyString.replaceAll("\\r|\\n", " ");
        //---Gets the string, breaks it into a list for every word,
        //---then strips out only the grades.
        //Is currently hardcoded for my layout for moodle, will soon find a way
@@ -228,14 +227,11 @@ public class WebReader
            
                newWord = "";
        }
-       
        //---Finds grades in the wordList
        for (int i = 0; i < wordList.size(); i++) {
-
            if (wordList.get(i).equals("My") && wordList.get(i + 1).equals("Grades")
                    && !wordList.get(i - 1).equals("Skip"))
            {
-               
                for (int j = i + 2; j < wordList.size(); j++) {
                    if (wordList.get(j).equals("Skip") || wordList.get(j).equals("Twin"))
                    {   
