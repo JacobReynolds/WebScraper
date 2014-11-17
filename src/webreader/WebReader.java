@@ -86,12 +86,6 @@ public class WebReader
         String grades = clean(page2.asText());
         File f = new File("Grades.txt");
         //---If there is not a grade file, create one
-        if (!f.exists())
-        {
-            updateGrades(grades);
-            sendEmail(grades);
-        }
-        else
         {
         if (!grades.equals(fileReader()))
         {  
