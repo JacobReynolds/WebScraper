@@ -49,11 +49,9 @@ public class WebReader
     
     public static void main(String[] args)
     {
-        System.out.println("1");
      WebReader app = new WebReader();
      Scanner scanner = new Scanner(System.in);
      Console console = System.console();
-        System.out.println("2");
      //---Takes in user input for login
         System.out.print("Username: ");
         username = scanner.nextLine();
@@ -65,7 +63,6 @@ public class WebReader
         emailPassword = new String(charEmailPassword);
         System.out.println("How often(in minutes) do you want your grades checked? ");
         refreshRate = Integer.parseInt(scanner.nextLine()) * 60000;
-        System.out.println("3");
         //---Starts program
         app.go();
     }
@@ -81,7 +78,6 @@ public class WebReader
     
     private void runProgram() throws IOException, InterruptedException
     {
-        System.out.println("4");
         System.out.println("Program running...");
         //---Get the HtmlPage with grades on it
         final HtmlPage page2 = getPage();
@@ -89,21 +85,17 @@ public class WebReader
         //---clean(String string) returns a string
         String grades = clean(page2.asText());
         File f = new File("Grades.txt");
-        System.out.println("10");
         if (!f.exists())
         {
-            System.out.println("11");
             updateGrades(grades);
             sendEmail(grades);
         }
         else
         //---If there is not a grade file, create one
         {
-            System.out.println("11 part 2");
         if (!grades.equals(fileReader()))
         {  
         //---Updates the grades in the saved file that it compares them to   
-            System.out.println("12");
         updateGrades(grades);
         
         //---Takes the new grades and sends them to the e-mail in the
@@ -118,7 +110,6 @@ public class WebReader
             Date date = new Date();
         System.out.println("Grades were checked at " + dateFormat.format(date));
         System.out.println();
-        System.out.println("13");
         gradesList.clear();
         
         Thread.sleep(refreshRate);
@@ -129,7 +120,6 @@ public class WebReader
    
     private HtmlPage getPage() throws IOException
     {
-        System.out.println("5");
         //---Suppresses unneeded warnings for CSS and other things
         LogFactory.getFactory().setAttribute("org.apache.commons.logging.Log",
                                     "org.apache.commons.logging.impl.NoOpLog");
@@ -139,7 +129,6 @@ public class WebReader
         final WebClient webClient = new WebClient(BrowserVersion.getDefault());
         webClient.getOptions().setUseInsecureSSL(true);
         webClient.getOptions().setThrowExceptionOnScriptError(false);
-        System.out.println("6");
         //---Get the first page
         final HtmlPage page1 = webClient.getPage("https://moodle.umn.edu");
 
@@ -152,14 +141,11 @@ public class WebReader
     
         userField.setValueAttribute(username);//---Insert username here
         passwordField.setValueAttribute(password);//---Insert password here
-        System.out.println("7");
         button.click();
-        System.out.println("8");
         //---New page after clicking the button
         final HtmlPage page2 = webClient.getPage("https://ay14.moodle.umn.edu/my/");
        
         webClient.closeAllWindows();
-        System.out.println("9");
         return page2;
     }
     
