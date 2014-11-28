@@ -49,9 +49,12 @@ public class WebReader
     
     public static void main(String[] args)
     {
+        System.out.println("1");
      WebReader app = new WebReader();
      Scanner scanner = new Scanner(System.in);
      Console console = System.console();
+        System.out.println("2");
+     //---Takes in user input for login
         System.out.print("Username: ");
         username = scanner.nextLine();
         char[] charPassword = console.readPassword("Enter password: ");
@@ -62,6 +65,8 @@ public class WebReader
         emailPassword = new String(charEmailPassword);
         System.out.println("How often(in minutes) do you want your grades checked? ");
         refreshRate = Integer.parseInt(scanner.nextLine()) * 60000;
+        System.out.println("3");
+        //---Starts program
         app.go();
     }
     
@@ -69,15 +74,14 @@ public class WebReader
     {
         try {
             runProgram();
-        } catch (IOException ex) {
-            Logger.getLogger(WebReader.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (InterruptedException ex) {
+        } catch (IOException | InterruptedException ex) {
             Logger.getLogger(WebReader.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
     private void runProgram() throws IOException, InterruptedException
     {
+        System.out.println("4");
         System.out.println("Program running...");
         //---Get the HtmlPage with grades on it
         final HtmlPage page2 = getPage();
@@ -85,17 +89,21 @@ public class WebReader
         //---clean(String string) returns a string
         String grades = clean(page2.asText());
         File f = new File("Grades.txt");
+        System.out.println("10");
         if (!f.exists())
         {
+            System.out.println("11");
             updateGrades(grades);
             sendEmail(grades);
         }
         else
         //---If there is not a grade file, create one
         {
+            System.out.println("11 part 2");
         if (!grades.equals(fileReader()))
         {  
-        //---Updates the grades in the saved file that it compares them to    
+        //---Updates the grades in the saved file that it compares them to   
+            System.out.println("12");
         updateGrades(grades);
         
         //---Takes the new grades and sends them to the e-mail in the
@@ -110,7 +118,9 @@ public class WebReader
             Date date = new Date();
         System.out.println("Grades were checked at " + dateFormat.format(date));
         System.out.println();
+        System.out.println("13");
         gradesList.clear();
+        
         Thread.sleep(refreshRate);
         
         go();
@@ -119,7 +129,7 @@ public class WebReader
    
     private HtmlPage getPage() throws IOException
     {
-       
+        System.out.println("5");
         //---Suppresses unneeded warnings for CSS and other things
         LogFactory.getFactory().setAttribute("org.apache.commons.logging.Log",
                                     "org.apache.commons.logging.impl.NoOpLog");
@@ -129,37 +139,35 @@ public class WebReader
         final WebClient webClient = new WebClient(BrowserVersion.getDefault());
         webClient.getOptions().setUseInsecureSSL(true);
         webClient.getOptions().setThrowExceptionOnScriptError(false);
-        
+        System.out.println("6");
         //---Get the first page
         final HtmlPage page1 = webClient.getPage("https://moodle.umn.edu");
 
-        //---Gets the login form and username and password fields in html
+        //---Gets the login form, username, and password fields in html
         final HtmlForm form = page1.getElementByName("lform");
 
         final HtmlSubmitInput button = form.getInputByValue("Sign In");
         final HtmlTextInput userField = form.getInputByName("j_username");
         final HtmlPasswordInput passwordField = form.getInputByName("j_password");
     
-        //---Change the value of the text fields
         userField.setValueAttribute(username);//---Insert username here
         passwordField.setValueAttribute(password);//---Insert password here
-       
-        //---Submits the form by clicking the button
+        System.out.println("7");
         button.click();
+        System.out.println("8");
         //---New page after clicking the button
         final HtmlPage page2 = webClient.getPage("https://ay14.moodle.umn.edu/my/");
        
-        //---Closes windows for current session
         webClient.closeAllWindows();
-        
+        System.out.println("9");
         return page2;
     }
     
     private void sendEmail(String inputMessage)
     {
-        
+        //---User login information
         final String username = email;
-        final String password = emailPassword;//---Put in password here
+        final String password = emailPassword;
         
         //---Sets server for gmail
         Properties props = new Properties();
@@ -205,18 +213,15 @@ public class WebReader
        List wordList = new LinkedList();
        String newWord = "";
        int beginningOfWord = 0;
-       //---Some words are seperated by a line seperator which is not a space
-       String newLine = System.getProperty("line.separator");
+       //---Some words are seperated by a line seperator 
+       //---or a break which is not a space
        dirtyString = dirtyString.replaceAll("\\r|\\n", " ");
-       //---Gets the string, breaks it into a list for every word,
-       //---then strips out only the grades.
+       //---Gets the string, breaks it into a list for every word
        //Is currently hardcoded for my layout for moodle, will soon find a way
        //to make it more compatable with any type of moodle layout.
        for (int i = 0; i < dirtyString.length(); i++) {
-           String convertCharToString = "";
-           convertCharToString += dirtyString.charAt(i);
            
-           if (dirtyString.charAt(i) == ' ' || convertCharToString.equals(newLine))
+           if (dirtyString.charAt(i) == ' ')
            {
                for (int j = beginningOfWord; j < i; j++) {
                    newWord += dirtyString.charAt(j);
@@ -254,9 +259,6 @@ public class WebReader
        
        BufferedReader br = null;
  
-        File file = new File("Grades.txt");
-//        if (file.exists())
-//        {
 		try {
  
 			String sCurrentLine;
@@ -268,12 +270,10 @@ public class WebReader
 			}
  
 		} catch (IOException e) {
-			e.printStackTrace();
 		} finally {
 			try {
 				if (br != null)br.close();
 			} catch (IOException ex) {
-				ex.printStackTrace();
 			}
 		}
  
@@ -282,32 +282,23 @@ public class WebReader
    
    public void updateGrades(String grades) throws FileNotFoundException, IOException
    {
-       BufferedReader br = null;
        BufferedWriter bw = null;
        File f = new File("Grades.txt");
        if (f.exists())
        {
-           br = new BufferedReader(new FileReader("Grades.txt"));
            bw = new BufferedWriter(new FileWriter("Grades.txt", false));
            bw.write(grades);
            bw.close();
-           br.close();
        }
        else
        {
            f.createNewFile();
-           br = new BufferedReader(new FileReader("Grades.txt"));
            bw = new BufferedWriter(new FileWriter("Grades.txt", false));
            bw.write(grades);
            bw.close();
-           br.close();
        }
       
    }
-
-
-
-   
    
 }
 
