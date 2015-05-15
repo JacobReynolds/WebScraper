@@ -1,5 +1,6 @@
 WebScraper
 ==========
+Updated version of this program can be found [here](http://www.github.com/jacobreynolds/moodlechecker)<br>
 ##About
 This is a web scraping program that will log in to the University of Minnesota Moodle website and compare current grades to the grades at the last time they were checked.  If they have been changed, an email will be sent with the updated grade values.
 <br>
